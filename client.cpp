@@ -1,6 +1,5 @@
 #include <iostream>
 #include <stdlib.h>
-// zgaduje server a client wiesza, bo inaczej sie srauo
 #include <unistd.h>
 #include <string.h>
 #include <sys/types.h>
@@ -10,26 +9,30 @@
 
 using namespace std;
 
+
 void error(string msg){
     cerr << msg << endl;
     exit(0);
 }
+
 
 int main(int argc, char *argv[]){
     int sockfd, portno, n;
     struct sockaddr_in serv_addr;
     struct hostent *server;
 
-    char buffer[256];
-    char buffer0[256]; // zawiera pierwotne slowo do zgadniecia
+    char buffer[255]; 			//sluzy do komunikacji
+    char litera[1];				//sluzy do wysylania liter
+    
+    //*********************LACZENIE SIE*******************************
     
     if (argc < 3) {
 		cerr << "Niepoprawna ilosc argumentow" << endl;
-		cerr << "./program IP port" << endl;
+		cerr << "Skladnia: NazwaProgramu IP port" << endl;
 		exit(0);
     }
     
-    portno = atoi(argv[2]);
+    portno = atoi(argv[2]);			//port
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     
     if (sockfd < 0) 
@@ -50,64 +53,62 @@ int main(int argc, char *argv[]){
     if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
         error("Blad polaczenia \n");
     
-    cout << "Witaj w grze WISELEC" << endl;
-    cout << "Jestes wieszajacym!" << endl;
-   
-    //cout << "Podaj prosze kategorie" << endl; na razie bez tego
     
-    bzero(buffer,256); // czyszczenie buffora
-    cout << "Ja: ";
-    cin >> buffer0;
+    //*********************LACZENIE SIE******************************
     
-        
-	char slowo[strlen(buffer0)];
-    for(int i = 0; i < strlen(buffer0); i++){
-		slowo[i] = '_';
-		//cout << slowo[i] << " ";
-		
-	}
-	//cout << endl;
-	n = write(sockfd,slowo,strlen(buffer0));
-    int counter = 0;    
-    while(1){
-		
-        
-             
-        bzero(buffer,256);
-        n = read(sockfd,buffer,255);
-        
-        if (n < 0) 
-             error("ERROR z czytaniem z gniazda\n");
-             
-        cout << "Zgadujacy: " << buffer << endl;
+    cout << "*********************" << endl;        
+    cout << "Witaj w grze WISIELEC" << endl;
+    cout << "Jestes zgadujacym!" << endl;
+    cout << "*********************" << endl;    
 
-        cout << "Ja: ";
-        
-        for(int i = 0; i < strlen(buffer0); i++){
-			if(buffer0[i] == buffer[0]){			
-				slowo[i] = buffer[0];
-				counter++;
-			}
+	bzero(buffer,255);								
+    n = write(sockfd,"a",1);											//0. probne wyslanie czegokolwiek
+    if (n < 0) 
+             error("ERROR z pisaniem do gniazda\n");
+    bzero(buffer,255);													//czyszczenie bufora
+    
+    cout << "Oczekiwanie na wybranie slowa przez wieszajacego..." << endl;
+
+
+    n = read(sockfd,buffer,255);										//1. odebranie slowa
+								
+    if (n < 0) 
+        error("ERROR z czytaniem z gniazda\n");
+	
+	cout << "Slowo: " ;
+	for(int i = 0; i < strlen(buffer); i++){
+			cout << buffer[i] << " ";
 		}
-        bzero(buffer,256);  // czyszczenie buffora
+    cout << endl;
+       
+    while(1){                  
+        cout << "Podaj litere: ";
         
-        if(counter == strlen(buffer0)){
-			cout << "Koniec gry"<< endl;
-			char stop[1];
-			stop[0]  = 'q';
-			n = write(sockfd,stop,strlen(stop));
-			break;
-		}
-           
-        n = write(sockfd,slowo,strlen(buffer0));
+        cin >> litera;													//wpisanie litery
+		
+		bzero(buffer,255);
+        n = write(sockfd,litera,strlen(litera));						//2. wyslanie litery
         
         if (n < 0) 
              error("ERROR z pisaniem do gniazda\n");
              
-        // wypisanie "Pa" wychodzi z programu - chyab obie stroy to musza zrobic
-        int i = strncmp("Pa" , buffer , 2);
-        if(i == 0)
-            break;
+        bzero(buffer,255);  
+        n = read(sockfd,buffer,255);									//3. odebranie informacji zwrotnej z servera
+        
+        if (n < 0) 
+			error("ERROR z czytaniem z gniazda");
+		
+		//cout << buffer; // TO NIE WYPISZE CALEGO BUFORA LADNIE, trzeba dac " "
+		
+		for(int i = 0; i < strlen(buffer); i++){
+			cout << buffer[i] << " ";
+		}
+		cout << endl;
+			
+		/*if(buffer[0] == NULL){
+			cout << "kuniec";
+			break;
+        }*/
     }
     close(sockfd);
     return 0;
