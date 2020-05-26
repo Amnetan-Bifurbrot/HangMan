@@ -1,0 +1,19 @@
+1. Żeby skompliować trzeba zrobić:
+g++ -o server server.cpp
+g++ -o client client.cpp
+
+2. Najpier należy uruchomć server poleceniem ./server <numer portu>  i uruchomić więcej termnali (2 docelowo) i uruchamić 
+./client <ip adres> <numer portu>, gdzie <ip adres> to adres servera
+
+Przykładowo: ./client 127.0.0.1 1111 oraz ./server 1111
+
+3. Wpisanie "Pa" ma zamykać połączenie u  klienta lub (chyba) u servera.
+
+4. TO DO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+-> coś, żeby zapamiętywało użyte już litery i może je wyświetlało
+-> dodanie kategorii pytań, żeby zgadujący wiedziłą co jest co
+-> rysowanie ludzika (jeżeli nam się chce)
+
+
+
