@@ -17,14 +17,17 @@ void error(string msg){
 
 
 int main(int argc, char *argv[]){
-    int sockfd, portno, n;
-    struct sockaddr_in serv_addr;
-    struct hostent *server;
+    int sockfd, portno, n;		//gniazdo clienta, numer portu, zmienna pomocnicza
+    struct sockaddr_in serv_addr;//adres clienta
+    struct hostent *server;		//host (chyba)
 
     char buffer[255]; 			//sluzy do komunikacji
     char litera[1];				//sluzy do wysylania liter
     
-    //*********************LACZENIE SIE*******************************
+
+
+
+
     
     if (argc < 3) {
 		cerr << "Niepoprawna ilosc argumentow" << endl;
@@ -33,15 +36,15 @@ int main(int argc, char *argv[]){
     }
     
     portno = atoi(argv[2]);			//port
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);							//otwieranie gniazda
     
     if (sockfd < 0) 
         error("Blad podczas otwierania gniazda");
         
-    server = gethostbyname(argv[1]);
+    server = gethostbyname(argv[1]);									//odnajdywanie hosta
     
     if (server == NULL) {
-		cerr << "ERROR - brak takiego hosta" << endl;
+		cerr << "Blad podczas wyszukiwania hosta" << endl;
         exit(0);
     }
     
@@ -50,65 +53,74 @@ int main(int argc, char *argv[]){
     bcopy((char *)server->h_addr,(char *)&serv_addr.sin_addr.s_addr,server->h_length);
     serv_addr.sin_port = htons(portno);
     
-    if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
+    if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) //laczenie sie z serverem
         error("Blad polaczenia \n");
+       
+
+
+
+
+
     
-    
-    //*********************LACZENIE SIE******************************
-    
-    cout << "*********************" << endl;        
-    cout << "Witaj w grze WISIELEC" << endl;
-    cout << "Jestes zgadujacym!" << endl;
-    cout << "*********************" << endl;    
+    cout << "*************************" << endl;        
+    cout << "* Witaj w grze WISIELEC *" << endl;
+    cout << "*  Jestes zgadujacym!   *" << endl;
+    cout << "*************************" << endl;    
 
 	bzero(buffer,255);								
     n = write(sockfd,"a",1);											//0. probne wyslanie czegokolwiek
     if (n < 0) 
-             error("ERROR z pisaniem do gniazda\n");
-    bzero(buffer,255);													//czyszczenie bufora
-    
+             error("Blad pisania do gniazda\n");
+   
     cout << "Oczekiwanie na wybranie slowa przez wieszajacego..." << endl;
 
-
-    n = read(sockfd,buffer,255);										//1. odebranie slowa
-								
+	bzero(buffer,255);
+    n = read(sockfd,buffer,255);										//1. odebranie slowa							
     if (n < 0) 
-        error("ERROR z czytaniem z gniazda\n");
+        error("Blad czytania z gniazda\n");
 	
-	cout << "Slowo: " ;
-	for(int i = 0; i < strlen(buffer); i++){
+											
+	int k = 0;															//zmienna zwiazana z wypisywaniem (bo czasem cos sie psulo jak server wysylal kod 4)
+    while(1){          
+		
+		cout << "Slowo: ";
+      
+		for(unsigned int i = k; i < strlen(buffer) - 1; i++){
 			cout << buffer[i] << " ";
 		}
-    cout << endl;
-       
-    while(1){                  
+
+		cout << endl << "Ilosc mozliwych bledow do wykorzystania: " << buffer[strlen(buffer) - 1] << endl;	
+		        
         cout << "Podaj litere: ";
         
         cin >> litera;													//wpisanie litery
 		
 		bzero(buffer,255);
         n = write(sockfd,litera,strlen(litera));						//2. wyslanie litery
-        
         if (n < 0) 
-             error("ERROR z pisaniem do gniazda\n");
+             error("Blad pisania do gniazda\n");
              
         bzero(buffer,255);  
         n = read(sockfd,buffer,255);									//3. odebranie informacji zwrotnej z servera
-        
         if (n < 0) 
-			error("ERROR z czytaniem z gniazda");
-		
-		//cout << buffer; // TO NIE WYPISZE CALEGO BUFORA LADNIE, trzeba dac " "
-		
-		for(int i = 0; i < strlen(buffer); i++){
+			error("Blad czytania z gniazda");
+		k = 0;
+		if(buffer[0] == '2'){											//wygrana
+			cout << "Udalo Ci sie odgadnac slowo!" << endl << "Slowo: ";
+			for(unsigned int i = 1; i < strlen(buffer) - 1; i++){
 			cout << buffer[i] << " ";
-		}
-		cout << endl;
-			
-		/*if(buffer[0] == NULL){
-			cout << "kuniec";
+			}
 			break;
-        }*/
+        }else if(buffer[0] == '1'){										//niepoprawny znak
+			cout << "Nie wyslales litery!" << endl;
+			continue;
+		}else if(buffer[0] == '3'){										//koniec szans na blad
+			cout << "Skonczyly Ci sie szanse!" << endl;
+			break;
+		}else if(buffer[0] == '4'){
+			cout << "Tej litery nie ma w zgadywanym slowie!" << endl;	//utrata jednej szansy
+			k = 1;
+		}
     }
     close(sockfd);
     return 0;
