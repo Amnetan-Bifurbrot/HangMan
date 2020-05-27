@@ -22,7 +22,7 @@ int main(int argc, char *argv[]){
     socklen_t clilen;
     char buffer[255];		//sluzy do komunikacji
     char buffer0[255];		//slowo do zgadniecia
-    //char used[255];		//przechowuje wykorzystane literki
+    char used[255];			//przechowuje wykorzystane literki
     bool guessed[255];		//sluzy do zaslaniania literek
     
     struct sockaddr_in serv_addr, cli_addr;	//adresy servera i clienta
@@ -108,13 +108,31 @@ int main(int argc, char *argv[]){
 	unsigned int counter = 0;
     while(1){															//zaczynamy zgadywanie
 		bzero(buffer,255);
-        n = read(newsockfd,buffer,255);									//2. odebranie literki i zapisanie jej w buforze 
+        n = read(newsockfd,buffer,255);									//2. odebranie literki 
         if (n < 0) 
 			error("Blad czytania z gniazda");
 			
-		if(!isalpha(buffer[0])){											
-			n = write(newsockfd, "1", 1);								//3a. jesli zgadujacy nie wyslal literki, to wysylamy mu 1, zeby wiedzial ze zrobil zle
+		if(!isalpha(buffer[0])){	
+			bzero(buffer,255);								
+			n = write(newsockfd, "1", 1);								//3a. jesli zgadujacy nie wyslal literki, to wysylamy mu '1', zeby wiedzial ze zrobil zle
 		}
+		
+		bool wasUsed = false;
+		for(unsigned int i = 0; i < strlen(used); i++){					//sprawdzamy czy dana litera juz sie nie pojawila
+			if(used[i] == buffer[0]){
+				wasUsed = true;
+				break;
+			}
+		}
+		
+		if(wasUsed && isalpha(buffer[0])){ 								//3f. jesli zgadujacy wyslal litere ktora juz wczesniej zostala uzyta
+			bzero(buffer,255);
+			n = write(newsockfd, "5", 1);
+		}						
+		else {
+			used[strlen(used)] = buffer[0];
+		}
+
 		
 		cout << "Zgadujacy wybral literke " << buffer << endl;
 		unsigned int oldcounter = counter;
@@ -128,18 +146,21 @@ int main(int argc, char *argv[]){
 		}
 		
 		
-		bzero(buffer,255);
+		
 		if(counter == l){
 			cout << "Koniec gry - zgadujacemu udalo sie zgadnac slowo!" << endl;
+			bzero(buffer,255);
 			n = write(newsockfd,"2",1);									//3b. wyslanie informacji o wygranej zgadujacego
 																
-		}else if(counter - oldcounter == 0){
+		}else if(counter - oldcounter == 0 && !wasUsed && isalpha(buffer[0])){
 			lvl--;
 			if(lvl - 48 < 0) {											//3c. wyslanie informacji o przegranej (utracie wszystkich szans na blad) (lvl - 48 bo ASCII)
+				bzero(buffer,255);
 				n = write(newsockfd,"3",1);
 				cout << "Zgadujacy utracil wszystkie szanse i przegrywa!" << endl; 
 			}				
 			else {														//3d. wyslanie informacji o utracie jednej szansy na blad
+				bzero(buffer,255);
 				n = write(newsockfd,"4",1);							
 				cout << "Zgadujacy utracil jedna szanse na blad!" << endl;
 			}
@@ -156,7 +177,12 @@ int main(int argc, char *argv[]){
 		
 		slowo[l] = lvl;
 		//cout << slowo << endl;
-		n = write(newsockfd,slowo,l + 1);								//3e. wyslanie slowa z powrotem
+		for(unsigned int i = 0; i < strlen(used); i++){
+			slowo[l + 1 + i] = used[i];
+		}
+		bzero(buffer,255);
+		cout << "buffer: " << buffer;
+		n = write(newsockfd,slowo,l + 1 + strlen(used));				//3e. wyslanie slowa razem z iloscia szans i lista wykorzystanych liter z powrotem
 		if (n < 0) 
 			error("Blad pisania do gniazda\n");
     }

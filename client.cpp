@@ -24,10 +24,6 @@ int main(int argc, char *argv[]){
     char buffer[255]; 			//sluzy do komunikacji
     char litera[1];				//sluzy do wysylania liter
     
-
-
-
-
     
     if (argc < 3) {
 		cerr << "Niepoprawna ilosc argumentow" << endl;
@@ -79,24 +75,27 @@ int main(int argc, char *argv[]){
     if (n < 0) 
         error("Blad czytania z gniazda\n");
 	
-											
+	int l = strlen(buffer) - 1;											//dlugosc slowa
 	int k = 0;															//zmienna zwiazana z wypisywaniem (bo czasem cos sie psulo jak server wysylal kod 4)
+	
     while(1){          
 		
 		cout << "Slowo: ";
       
-		for(unsigned int i = k; i < strlen(buffer) - 1; i++){
+		for(int i = k; i < l + k; i++){
 			cout << buffer[i] << " ";
 		}
-
-		cout << endl << "Ilosc mozliwych bledow do wykorzystania: " << buffer[strlen(buffer) - 1] << endl;	
+		cout << endl << "Ilosc mozliwych bledow do wykorzystania: " << buffer[l + k] << endl << "Wykorzystane litery: ";
+		for(unsigned int i = l + 1 + k; i < strlen(buffer); i++){
+			cout << buffer[i] << ", ";									//wypisanie uzytych liter
+		}	
 		        
-        cout << "Podaj litere: ";
+        cout << endl << "Podaj litere: ";
         
         cin >> litera;													//wpisanie litery
 		
 		bzero(buffer,255);
-        n = write(sockfd,litera,strlen(litera));						//2. wyslanie litery
+        n = write(sockfd,litera,1);										//2. wyslanie litery
         if (n < 0) 
              error("Blad pisania do gniazda\n");
              
@@ -104,21 +103,25 @@ int main(int argc, char *argv[]){
         n = read(sockfd,buffer,255);									//3. odebranie informacji zwrotnej z servera
         if (n < 0) 
 			error("Blad czytania z gniazda");
+			
 		k = 0;
 		if(buffer[0] == '2'){											//wygrana
 			cout << "Udalo Ci sie odgadnac slowo!" << endl << "Slowo: ";
-			for(unsigned int i = 1; i < strlen(buffer) - 1; i++){
+			for(int i = 1; i < l + 1; i++){
 			cout << buffer[i] << " ";
 			}
 			break;
         }else if(buffer[0] == '1'){										//niepoprawny znak
 			cout << "Nie wyslales litery!" << endl;
-			continue;
+			k = 1;
 		}else if(buffer[0] == '3'){										//koniec szans na blad
 			cout << "Skonczyly Ci sie szanse!" << endl;
 			break;
-		}else if(buffer[0] == '4'){
-			cout << "Tej litery nie ma w zgadywanym slowie!" << endl;	//utrata jednej szansy
+		}else if(buffer[0] == '4'){										//utrata jednej szansy
+			cout << "Tej litery nie ma w zgadywanym slowie!" << endl;	
+			k = 1;
+		}else if(buffer[0] == '5'){										//uzycie wykorzystanej juz litery
+			cout << "Uzyles wczesniej tej litery!" << endl;
 			k = 1;
 		}
     }
