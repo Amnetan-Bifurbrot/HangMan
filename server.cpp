@@ -1,3 +1,10 @@
+/*****************************************************************
+ * Projekt z przedmiotu Sieci Komputerowe                        *
+ * Temat projektu: C. Gra odgadywanie slow                       *
+ * Autorzy: Zuzanna Wieczorek (291565), Adam Wisniewski (291569) *
+ * Grupa: sk-cz-12-p		                                     *
+ *****************************************************************/
+ 
 #include <iostream>
 #include <stdlib.h>
 #include <string.h>
@@ -25,14 +32,19 @@ int main(int argc, char *argv[]){
     char used[255];			//przechowuje wykorzystane literki
     bool guessed[255];		//sluzy do zaslaniania literek
     
+    
+    //***********************************************
+    //* kod ponizej zostal stworzony na podstawie:  *
+    //* https://www.youtube.com/watch?v=CMDBF84vSRk *
+	//* https://www.youtube.com/watch?v=Ts8eXOkx8TE *
+    //***********************************************
+    
     struct sockaddr_in serv_addr, cli_addr;	//adresy servera i clienta
     int n;
     if (argc < 2) {
         cerr << "Nie podano numeru portu!" << endl;
         exit(1);
     }
-    
-    
     
     
     sockfd = socket(AF_INET, SOCK_STREAM, 0);							//otwieranie gniazda servera
@@ -63,8 +75,9 @@ int main(int argc, char *argv[]){
         error("Blad akceptacji");
         
 
-
-
+	//*******************************************************
+	//* kod ponizej zostal stworzony przez autorow projektu *
+	//*******************************************************
     
     cout << "*************************" << endl;    
     cout << "* Witaj w grze WISIELEC *" << endl;

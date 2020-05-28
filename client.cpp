@@ -1,3 +1,10 @@
+/*****************************************************************
+ * Projekt z przedmiotu Sieci Komputerowe                        *
+ * Temat projektu: C. Gra odgadywanie slow                       *
+ * Autorzy: Zuzanna Wieczorek (291565), Adam Wisniewski (291569) *
+ * Grupa: sk-cz-12-p		                                     *
+ *****************************************************************/
+
 #include <iostream>
 #include <stdlib.h>
 #include <unistd.h>
@@ -9,7 +16,7 @@
 
 using namespace std;
 
-string drawHangMan(int number){
+string drawHangMan(int number){											//rysowanie wisielca :)
 	
 	string hangman;
 	switch(number){
@@ -126,6 +133,12 @@ void error(string msg){
 
 
 int main(int argc, char *argv[]){
+	
+	//***********************************************
+	//* kod ponizej zostal stworzony na podstawie:  *
+	//* https://www.youtube.com/watch?v=DboEGcU6rLI *
+	//***********************************************
+	
     int sockfd, portno, n;		//gniazdo clienta, numer portu, zmienna pomocnicza
     struct sockaddr_in serv_addr;//adres clienta
     struct hostent *server;		//host (chyba)
@@ -161,19 +174,17 @@ int main(int argc, char *argv[]){
     if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) //laczenie sie z serverem
         error("Blad polaczenia \n");
        
-
-
-
-
-
-    
+	//*******************************************************
+	//* kod ponizej zostal stworzony przez autorow projektu *
+	//*******************************************************
+	
     cout << "*************************" << endl;        
     cout << "* Witaj w grze WISIELEC *" << endl;
     cout << "*  Jestes zgadujacym!   *" << endl;
     cout << "*************************" << endl;    
 
 	bzero(buffer,255);								
-    n = write(sockfd,"a",1);											//0. probne wyslanie czegokolwiek
+    n = write(sockfd,"a",1);											//0. probne wyslanie czegokolwiek (inaczej server nie dziala)
     if (n < 0) 
              error("Blad pisania do gniazda\n");
    
@@ -186,7 +197,7 @@ int main(int argc, char *argv[]){
 	
 	int l = strlen(buffer) - 1;											//dlugosc slowa
 	int k = 0;															//zmienna zwiazana z wypisywaniem (bo czasem cos sie psulo jak server wysylal kod 4)													
-	int chances = 0, m = 0;												// do liczenia szans by rysowac ludzika												
+	int chances = 0, m = 0;												//do liczenia szans by rysowac ludzika												
     while(1){          
 		m++;
 		cout << "Slowo: ";

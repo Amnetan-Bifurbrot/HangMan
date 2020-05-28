@@ -1,0 +1,10 @@
+DOKUMENTACJA UZYTKOWNIKA
+Autorzy: Zuzanna Wieczorek (291565), Adam Wisniewski (291569)
+Grupa: sk-cz-12-p
+
+W celu rozpoczecia gry osoba hostujaca gre (i jednoczesnie "wieszajaca") musi uruchomic serwer komenda: server numer_portu. 
+Nastepnie zeby dolaczyc do rozgrywki (jako "zgadujacy") nalezy w innym terminalu/maszynie wirtualnej uruchomic klienta komenda: client numer_IP_serwera numer_portu.
+Jako numer IP serwera nalezy wziac lokalne IP hostujacego gre.
+
+Nastepnie gracz "wieszajacy" podaje slowo, ktore nalezy zgadnac, a nastepnie poziom trudnosci.
+W tym momencie rozgrywka polega na odgadywaniu przez "zgadujacego" slowa poprzez podawanie pojedynczych liter do momentu wygranej lub utracenia wszystkich szans na pomylke.

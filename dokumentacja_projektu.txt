@@ -1,0 +1,20 @@
+DOKUMENTACJA PROJEKTU "GRA ODGADYWANIE SLOW"
+Autorzy: Zuzanna Wieczorek (291565), Adam Wisniewski (291569)
+Grupa: sk-cz-12-p
+
+W porownaniu z poprzednia wersja specyfikacji kilka rzeczy uleglo zmianie:
+	- zamiast 2 klientow w roli graczy i 1 serwera w roli srodka komunikacji miedzy nimi jest:
+		- 1 serwer w roli jednego gracza ("wieszajacego")
+		oraz
+		- 1 klient w roli drugiego gracza ("zgadujacego")
+	- gracz podajacy slowo nie podaje kategorii
+	- schemat dzialania gry:
+		1a. Wieszajacy hostuje serwer i oczekuje na zgadujacego
+		1b. Zgadujacy laczy sie z serwerem
+		2. Wieszajacy podaje slowo do odgadniecia oraz poziom trudnosci (ilosc pomylek, jakie moze popelnic zgadujacy, zanim przegra gre) (od 0 do 9)
+		3. Zgadujacy wysyla pojedynczy znak:
+			- jesli znak nie jest litera, otrzymuje od serwera informacje o tym, lecz nie traci szansy na pomylke
+			- jesli znak jest litera i znajduje sie w slowie do odgadniecia, otrzymuje od serwera informacje o tym i moze zgadywac dalej
+			- jesli znak jest litera i nie znajduje sie w slowie do odgadniecia, otrzymuje od serwera informacje o tym i traci szanse na pomylke
+			- jesli znak jest litera i byl juz wczesniej uzyty, otrzymuje od serwera informacje o tym, lecz nie traci szansy na pomylke
+		4. Rozgrywka konczy sie w momencie, gdy zgadujacy odgadnie wszystkie litery w slowie lub straci wszystkie szanse na pomylke.
