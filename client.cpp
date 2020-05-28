@@ -9,6 +9,115 @@
 
 using namespace std;
 
+string drawHangMan(int number){
+	
+	string hangman;
+	switch(number){
+		case 0: {
+		hangman =  " +---+\n";
+		hangman += " |   |\n";
+		hangman += " |   o\n";
+		hangman += " |  /|\\\n";
+		hangman += " |  / \\\n";
+		hangman += " |\n";
+		hangman += "-+-\n\n";
+		}	
+		break;
+
+    case 1: {
+		hangman =  " +---+\n";
+		hangman += " |   |\n";
+		hangman += " |   o\n";
+		hangman += " |  /|\\\n";
+		hangman += " |  /\n";
+		hangman += " |\n";
+		hangman += "-+-\n\n";
+		}
+		break;
+
+    case 2: {
+		hangman =  " +---+\n";
+		hangman += " |   |\n";
+		hangman += " |   o\n";
+		hangman += " |  /|\\\n";
+		hangman += " |\n";
+		hangman += " |\n";
+		hangman += "-+-\n\n";
+		}
+		break;
+
+    case 3: {
+		hangman =  " +---+\n";
+		hangman += " |   |\n";
+		hangman += " |   o\n";
+		hangman += " |  /|\n";
+		hangman += " |\n";
+		hangman += " |\n";
+		hangman += "-+-\n\n";
+		}
+		break;
+
+    case 4: {
+		hangman =  " +---+\n";
+		hangman += " |   |\n";
+		hangman += " |   o\n";
+		hangman += " |   |\n";
+		hangman += " |\n";
+		hangman += " |\n";
+		hangman += "-+-\n\n";
+		}
+		break;
+
+    case 5: {
+		hangman =  " +---+\n";
+		hangman += " |   |\n";
+		hangman += " |   o\n";
+		hangman += " |\n";
+		hangman += " |\n";
+		hangman += " |\n";
+		hangman += "-+-\n\n";
+		}
+		break;
+
+    case 6: {
+		hangman =  " +---+\n";
+		hangman += " |   |\n";
+		hangman += " |\n";
+		hangman += " |\n";
+		hangman += " |\n";
+		hangman += " |\n";
+		hangman += "-+-\n\n";
+		}
+		break;
+	
+	case 7: {
+		hangman =  " +---+\n";
+		hangman += " |    \n";
+		hangman += " |\n";
+		hangman += " |\n";
+		hangman += " |\n";
+		hangman += " |\n";
+		hangman += "-+-\n\n";
+		}
+		break;
+	
+	case 8: {
+		hangman =  " +    \n";
+		hangman += " |    \n";
+		hangman += " |\n";
+		hangman += " |\n";
+		hangman += " |\n";
+		hangman += " |\n";
+		hangman += "-+-\n\n";
+		}
+		break;
+		
+    default:
+       break;
+	}
+	
+	 return hangman;	
+}
 
 void error(string msg){
     cerr << msg << endl;
@@ -76,15 +185,22 @@ int main(int argc, char *argv[]){
         error("Blad czytania z gniazda\n");
 	
 	int l = strlen(buffer) - 1;											//dlugosc slowa
-	int k = 0;															//zmienna zwiazana z wypisywaniem (bo czasem cos sie psulo jak server wysylal kod 4)
-	
+	int k = 0;															//zmienna zwiazana z wypisywaniem (bo czasem cos sie psulo jak server wysylal kod 4)													
+	int chances = 0, m = 0;												// do liczenia szans by rysowac ludzika												
     while(1){          
-		
+		m++;
 		cout << "Slowo: ";
       
 		for(int i = k; i < l + k; i++){
 			cout << buffer[i] << " ";
 		}
+		
+		cout << endl;
+		
+		if(m == 1){
+			chances = (int)buffer[l+k] - 48;
+		}
+		
 		cout << endl << "Ilosc mozliwych bledow do wykorzystania: " << buffer[l + k] << endl << "Wykorzystane litery: ";
 		for(unsigned int i = l + 1 + k; i < strlen(buffer); i++){
 			cout << buffer[i] << ", ";									//wypisanie uzytych liter
@@ -118,7 +234,9 @@ int main(int argc, char *argv[]){
 			cout << "Skonczyly Ci sie szanse!" << endl;
 			break;
 		}else if(buffer[0] == '4'){										//utrata jednej szansy
-			cout << "Tej litery nie ma w zgadywanym slowie!" << endl;	
+			cout << "Tej litery nie ma w zgadywanym slowie!" << endl;
+			chances--;		
+			cout << drawHangMan(chances - 1);							// rysowanie ludzika				
 			k = 1;
 		}else if(buffer[0] == '5'){										//uzycie wykorzystanej juz litery
 			cout << "Uzyles wczesniej tej litery!" << endl;
